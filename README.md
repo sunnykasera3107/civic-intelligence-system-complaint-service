@@ -30,6 +30,7 @@ POST /register_complaint
 URL: Base URL  
 
 Request Body:
+```
 {
   "category": 1, // Category text mapping can be managed using json
   "subcategory": 2, // Category text mapping can be managed using json
@@ -41,6 +42,7 @@ Request Body:
   "complainer": 1,
   "officer": 1
 }
+```
 
 ---
 
@@ -50,12 +52,13 @@ POST /update_complaint
 URL: Base URL  
 
 Request Body:
+```
 {
   "id": 101,
   "status": 3,
   "complainer": 1
 }
-
+```
 ---
 
 ### 3. Get Complaints
@@ -94,12 +97,13 @@ POST /comment
 URL: Base URL  
 
 Request Body:
+```
 {
   "complaint_id": 101,
   "user_id": 1,
   "comment": "We are reviewing this complaint."
 }
-
+```
 ---
 
 ### 6. Get Comments
