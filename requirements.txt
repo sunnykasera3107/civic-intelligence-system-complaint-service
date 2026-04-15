@@ -3,7 +3,5 @@ uvicorn[standard]
 httpx
 sqlalchemy
 psycopg2-binary 
-bcrypt
 pydantic
-phonenumbers
 fastapi_mail

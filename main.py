@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 from app.utils.http_client import HttpClient
-from app.api.routes import router
+from app.api.routes import comment, complaint
 
 
 def setup_logging():
@@ -48,7 +48,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(router)
+app.include_router(complaint.router)
+app.include_router(comment.router)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
