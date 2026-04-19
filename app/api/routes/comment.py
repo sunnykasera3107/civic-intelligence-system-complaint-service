@@ -30,28 +30,22 @@ async def add_comment(
     db: Session = Depends(get_db)
 ):
 
+    data = comment.model_dump()
     new_comment = comment_model.Comment(
-        complaint=comment.complaint,
-        comment=comment.comment,
-        file=comment.file,
-        user=comment.user,
-        created_on=datetime.now()
+        **data
     )
 
     db.add(new_comment)
     db.commit()
     db.refresh(new_comment)
     
-    return {
-        "message": "Comment added successfully"
-    }
-
+    return new_comment
 
 @router.get("/comments/{complaint_id}", response_model=list[comment_schema.CommentFetch])
 def get_comments(complaint_id: int, db: Session = Depends(get_db)):
     # Check if comments already exists
     comments = db.query(comment_model.Comment).filter(
-        comment_model.Comment.complaint == complaint_id
+        comment_model.Comment.complaintId == complaint_id
     ).all()
 
     if not comments:
@@ -60,4 +54,4 @@ def get_comments(complaint_id: int, db: Session = Depends(get_db)):
             detail="No comments found on this complaint"
         )
 
-    return comments
+    return comments or None

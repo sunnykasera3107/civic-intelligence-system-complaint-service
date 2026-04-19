@@ -31,26 +31,28 @@ async def register_complaint(
 ):
     # Check if complaint already exists
     existing_complaint = db.query(complaint_model.Complaint).filter(
-        complaint_model.Complaint.category == complaint.category,
-        complaint_model.Complaint.subcategory == complaint.subcategory,
-        complaint_model.Complaint.complaint == complaint.complaint,
-        complaint_model.Complaint.complainer == complaint.complainer
+        complaint_model.Complaint.categoryId == complaint.categoryId,
+        complaint_model.Complaint.subcategoryId == complaint.subcategoryId,
+        complaint_model.Complaint.latitude == complaint.latitude,
+        complaint_model.Complaint.longitude == complaint.longitude,
+        complaint_model.Complaint.complainer == complaint.complainer,
+        complaint_model.Complaint.statusId.in_([1, 2])
     ).first()
     if existing_complaint:
-        raise HTTPException(
-            status_code=400, 
-            detail="Complaint already registered"
-        )
+        return existing_complaint
 
     # Create complaint
     new_complaint = complaint_model.Complaint(
-        category=complaint.category,
-        subcategory=complaint.subcategory,
+        title=complaint.title,
+        description=complaint.description,
+        categoryId=complaint.categoryId,
+        subcategoryId=complaint.subcategoryId,
+        statusId=complaint.statusId,
+        city=complaint.city,
         location=complaint.location,
-        location_url=complaint.location_url,
-        complaint=complaint.complaint,
-        file=complaint.file,
-        status=complaint.status,
+        latitude=complaint.latitude,
+        longitude=complaint.longitude,
+        file_path=complaint.file_path,        
         complainer=complaint.complainer,
         officer=complaint.officer
     )
@@ -59,9 +61,7 @@ async def register_complaint(
     db.commit()
     db.refresh(new_complaint)
 
-    return {
-        "message": "Complaint registered successfully"
-    }
+    return new_complaint
 
 
 @router.post("/update_complaint")
@@ -73,25 +73,40 @@ async def update_complaint(
     existing_complaint = db.query(complaint_model.Complaint).filter(
         complaint_model.Complaint.id == complaint.id,
     ).first()
+
     if not existing_complaint:
         raise HTTPException(
             status_code=400, 
             detail="Complaint not found"
         )
     
-    if existing_complaint.complainer == complaint.complainer :
+    if existing_complaint.complainer != complaint.complainer :
         raise HTTPException(
             status_code=400, 
             detail="Only complainer can update status"
         )
 
-    existing_complaint.status = complaint.status
+    existing_complaint.statusId = complaint.statusId
     
     db.commit()
 
     return {
         "message": "Complaint registered successfully"
     }
+
+
+@router.get("/all_complaints", response_model=list[complaint_schema.ComplaintFetch])
+def all_complaints(db: Session = Depends(get_db)):
+    # Check if complaint already exists
+    complaints = db.query(complaint_model.Complaint).all()
+
+    if not complaints:
+        raise HTTPException(
+            status_code=404, 
+            detail="No complaint registered with this user account"
+        )
+
+    return complaints
 
 
 @router.get("/complaints/{user_id}", response_model=list[complaint_schema.ComplaintFetch])

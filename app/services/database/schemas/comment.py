@@ -4,18 +4,21 @@ from pydantic import BaseModel
 
 
 class CommentCreate(BaseModel):
-    complaint: int
+    complaintId: int
+    user: str
+    userId: int
     comment: str
     file: str
-    user: int
 
 
 class CommentFetch(BaseModel):
-    complaint: int
+    id: int
+    complaintId: int
     comment: str
     file: str
-    user: int
-    created_on: datetime
+    user: str
+    userId: int
+    createdAt: datetime
 
     class Config:
         from_attributes = True

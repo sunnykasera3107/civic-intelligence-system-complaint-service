@@ -3,29 +3,35 @@ from datetime import datetime
 from pydantic import BaseModel
 
 class ComplaintCreate(BaseModel):
-    category: int
-    subcategory: int
+    title: str
+    description: str
+    categoryId: int
+    subcategoryId: int
+    statusId: int
+    city: str
     location: str
-    location_url: str
-    complaint: str
-    file: str
-    status: int
+    latitude: float
+    longitude: float
+    file_path: str
     complainer: int
     officer: int
 
 
 class ComplaintFetch(BaseModel):
-    category: int
-    subcategory: int
+    id: int
+    title: str
+    description: str
+    categoryId: int
+    subcategoryId: int
+    statusId: int
     location: str
-    location_url: str
-    complaint: str
-    file: str
-    status: int
+    latitude: float
+    longitude: float
+    file_path: str
     complainer: int
     officer: int
-    created_on: datetime
-    updated_on: datetime
+    createdAt: datetime
+    updatedAt: datetime
 
     class Config:
         from_attributes = True
@@ -33,5 +39,5 @@ class ComplaintFetch(BaseModel):
 
 class ComplaintUpdate(BaseModel):
     id: int
-    status: int
+    statusId: int
     complainer: int
