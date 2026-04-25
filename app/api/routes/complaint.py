@@ -1,8 +1,10 @@
 import os
 from datetime import datetime
+import json
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from redis import Redis
 
 from app.services.database.schemas import complaint as complaint_schema
 from app.services.database.schemas import comment as comment_schema
@@ -14,6 +16,11 @@ from app.services.email.sender import send_email
 
 Base.metadata.create_all(bind=engine)
 router = APIRouter()
+rd = Redis(
+    host=os.getenv("REDIS_HOST"),
+    port=os.getenv("REDIS_PORT"),
+    decode_responses=True
+)
 
 
 def get_db():
@@ -98,8 +105,25 @@ async def update_complaint(
 @router.get("/all_complaints", response_model=list[complaint_schema.ComplaintFetch])
 def all_complaints(db: Session = Depends(get_db)):
     # Check if complaint already exists
-    complaints = db.query(complaint_model.Complaint).all()
+    complaints_exist = False
+    if rd.exists("complaints"):
+        complaints = json.loads(rd.get("complaints"))
+        if len(complaints) > 0:
+            complaints_exist = True
+    if not complaints_exist:
+        print("test2")
+        complaints = db.query(complaint_model.Complaint).all()
+        complaints_json = json.dumps([
+            {
+                k: v for k, v in c.__dict__.items()
+                if not k.startswith("_")
+            }
+            for c in complaints
+        ], default=str)
+        rd.set("complaints", complaints_json)
 
+
+    print(complaints)
     if not complaints:
         raise HTTPException(
             status_code=404, 
