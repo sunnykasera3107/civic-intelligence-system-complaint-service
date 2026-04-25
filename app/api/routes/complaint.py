@@ -68,7 +68,27 @@ async def register_complaint(
     db.commit()
     db.refresh(new_complaint)
 
-    return new_complaint
+    complaints_exist = False
+    if rd.exists("complaints"):
+        complaints = json.loads(rd.get("complaints"))
+        if len(complaints) > 0:
+            new_complaint_json = {
+                k: v for k, v in new_complaint.__dict__.items()
+                if not k.startswith("_")
+            }
+            complaints.append(new_complaint_json)
+            complaints_exist = True
+            rd.set("complaints", json.dumps(complaints, default=str))
+            print("saved_rd")
+            print(complaints)
+    
+
+    if not complaints_exist:
+        complaints = [new_complaint]
+        print("unsaved_rd")
+        print(complaints)
+
+    return complaints
 
 
 @router.post("/update_complaint")
@@ -111,19 +131,18 @@ def all_complaints(db: Session = Depends(get_db)):
         if len(complaints) > 0:
             complaints_exist = True
     if not complaints_exist:
-        print("test2")
         complaints = db.query(complaint_model.Complaint).all()
-        complaints_json = json.dumps([
-            {
-                k: v for k, v in c.__dict__.items()
-                if not k.startswith("_")
-            }
-            for c in complaints
-        ], default=str)
-        rd.set("complaints", complaints_json)
+        
+        if len(complaints) > 0:
+            complaints_json = json.dumps([
+                {
+                    k: v for k, v in c.__dict__.items()
+                    if not k.startswith("_")
+                }
+                for c in complaints
+            ], default=str)
+            rd.set("complaints", complaints_json)
 
-
-    print(complaints)
     if not complaints:
         raise HTTPException(
             status_code=404, 

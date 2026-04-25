@@ -6,3 +6,4 @@ psycopg2-binary
 pydantic
 fastapi_mail
 redis
+PyJWT
