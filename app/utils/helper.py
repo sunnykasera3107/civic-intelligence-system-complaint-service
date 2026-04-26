@@ -1,15 +1,14 @@
-from datetime import datetime, timedelta
 import logging
-import os
-
-import bcrypt
-from fastapi import Depends, HTTPException
-import jwt
-from jwt.exceptions import InvalidTokenError
 
 logger = logging.getLogger(__name__)
 
 
 class Helper:
-    pass
+    
+    @staticmethod
+    def to_dict(model):
+        return {
+            column.name: getattr(model, column.name)
+            for column in model.__table__.columns
+        }
         

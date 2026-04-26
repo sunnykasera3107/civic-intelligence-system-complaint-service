@@ -13,8 +13,10 @@ class ComplaintCreate(BaseModel):
     latitude: float
     longitude: float
     file_path: str
-    complainer: int
-    officer: int
+    complainerId: int
+    officerId: int
+    complainer: str
+    officer: str
 
 
 class ComplaintFetch(BaseModel):
@@ -28,8 +30,10 @@ class ComplaintFetch(BaseModel):
     latitude: float
     longitude: float
     file_path: str
-    complainer: int
-    officer: int
+    complainerId: int
+    officerId: int
+    complainer: str
+    officer: str
     createdAt: datetime
     updatedAt: datetime
 
@@ -40,4 +44,4 @@ class ComplaintFetch(BaseModel):
 class ComplaintUpdate(BaseModel):
     id: int
     statusId: int
-    complainer: int
+    complainerId: int
